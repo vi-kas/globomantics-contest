@@ -5,7 +5,7 @@ import java.util.UUID
 
 import akka.http.scaladsl.marshallers.sprayjson._
 import com.globomantics.services._
-import spray.json._
+import spray.json.{JsValue, _}
 
 object Model extends SprayJsonSupport with DefaultJsonProtocol {
 
@@ -43,7 +43,6 @@ object Model extends SprayJsonSupport with DefaultJsonProtocol {
   }
 
   implicit val errorJsonFormat = jsonFormat2(ErrorResponse)
-  implicit val apiResponseJsonFormat = jsonFormat4(ApiResponse)
 
   implicit val locationJsonFormat = jsonFormat3(Location)
   implicit val addressJsonFormat = jsonFormat2(Address)
@@ -57,7 +56,10 @@ object Model extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val conferenceJsonFormat = jsonFormat3(Conference)
 
   implicit val participantJsonFormat = jsonFormat3(Participant)
+  implicit val contestJsonFormat = jsonFormat3(Contest)
   implicit val contastRegJsonFormat = jsonFormat2(ContestRegistration)
+  implicit val contastCreaJsonFormat = jsonFormat1(ContestCreation)
+  implicit val apiResponseJsonFormat = jsonFormat2(ApiResponse)
 
 
   object UserRole extends Enumeration {
@@ -88,9 +90,12 @@ object Model extends SprayJsonSupport with DefaultJsonProtocol {
 
   case class User(id: UUID, name: String, email: String, password: String, address: Address, role: UserRole) extends Entity
 
-  case class Contest(id: UUID, title: String, durationInMins: Double) extends Entity
   case class Participant(id: UUID, username: String, email: String) extends Entity
+  case class Contest(id: UUID, title: String, durationInMinutes: Double) extends Entity
 
   sealed trait ContestHttpRequest
   case class ContestRegistration(contestId: UUID, participant: Participant) extends ContestHttpRequest
+  case class ContestCreation(contest: Contest) extends ContestHttpRequest
+
+  case class ApiResponse(message: String, data: JsValue = JsString(""))
 }

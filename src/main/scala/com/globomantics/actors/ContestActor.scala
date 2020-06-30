@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import com.globomantics.persistance.Model._
 
-object Contest {
+object ContestActor {
   import ContestManager.{JoinContest, RegisterParticipant, StartContest, StopContest}
 
   /**

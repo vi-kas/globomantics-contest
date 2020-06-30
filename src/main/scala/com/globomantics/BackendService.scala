@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior}
 import akka.http.scaladsl.Http
 import com.globomantics.routes.ContestRoutes
-import com.globomantics.actors.{Contest, ContestManager}
+import com.globomantics.actors.{ContestActor, ContestManager}
 
 import scala.util.{Failure, Success}
 
@@ -25,7 +25,7 @@ object BackendService {
       implicit val classicActorSystem: actor.ActorSystem = system.classicSystem
       import system.executionContext
 
-      val contestManager = context.spawn(ContestManager(), "contest")
+      val contestManager = context.spawn(ContestManager(), "contest-manager")
       val allRoutes = new ContestRoutes(contestManager)(system)
 
       val futureBinding = Http().bindAndHandle(allRoutes.routes, host, port)
