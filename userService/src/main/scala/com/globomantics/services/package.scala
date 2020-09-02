@@ -12,7 +12,7 @@ import scala.util.Try
 package object services {
 
   /**
-    * Response type alias for typical Service Response
+    * Response type alias for a typical Service Response
     */
   type ServiceResponse[T] = Either[ErrorResponse, T]
 
@@ -30,11 +30,17 @@ package object services {
         case Left(error) =>
           HttpResponse(
             status = toStatusCode(error.code),
-            entity = HttpEntity(ContentTypes.`application/json`, ApiResponse(false, Some(error.code), Some(error.message)).toJson.toString))
+            entity = HttpEntity(
+              ContentTypes.`application/json`,
+              ApiResponse(false, Some(error.code),Some(error.message)).toJson.toString)
+          )
         case Right(value) =>
           HttpResponse(
             status = StatusCodes.Created,
-            entity = HttpEntity(ContentTypes.`application/json`, ApiResponse(true, data = value.toJson).toJson.toString))
+            entity = HttpEntity(
+              ContentTypes.`application/json`,
+              ApiResponse(true, data = value.toJson).toJson.toString)
+          )
       }
     }
 
