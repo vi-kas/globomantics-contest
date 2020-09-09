@@ -17,9 +17,9 @@ object Server extends App {
   def config: Config = ConfigFactory.load()
 
   val userDaoImpl: UserDaoImpl = wire[UserDaoImpl]
-  val userService: UserServiceDBImpl = wire[UserServiceDBImpl]
-//  val userService: UserServiceImpl = wire[UserServiceImpl]
 
+//  val userService: UserServiceImpl = wire[UserServiceImpl]
+  val userService: UserServiceDBImpl = wire[UserServiceDBImpl]
 
   val userRoutes: UserRoutes = wire[UserRoutes]
   val serviceRoutes: Route = userRoutes.routes

@@ -1,15 +1,12 @@
 package com.globomantics.services
 
 import java.util.UUID
-import java.util.concurrent.ForkJoinPool
 
 import com.globomantics.persistence.Model.User
 import com.typesafe.config.Config
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
-
-//import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
@@ -17,9 +14,6 @@ class UserServiceImpl(config: Config) extends UserService {
 
   private val logger: Logger = LoggerFactory.getLogger(getClass.getName)
   private var Users = Map[UUID, User]()
-
-  implicit val threadPool: ForkJoinPool = new ForkJoinPool(2)
-  implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutorService(threadPool)
 
   override def all: Future[ServiceResponse[Seq[User]]] = Future {
     logger.info("[all]")

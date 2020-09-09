@@ -1,6 +1,5 @@
 package com.globomantics.services
 
-import java.lang.Exception
 import java.util.UUID
 
 import com.globomantics.persistence.Model.User
@@ -30,8 +29,6 @@ class UserServiceDBImpl(config: Config, userDao: UserDao) extends UserService {
   override def create(user: User): Future[ServiceResponse[User]] = {
     logger.info("[create] - {}", user.id)
 
-    //val createdUser: Future[User] = userDao.insert(user)
-
     encryptPassword(user)
       .zip(isUsernameUnique(user))
       .flatMap { encUserAndIsUnique: (User, Boolean) =>
@@ -48,76 +45,18 @@ class UserServiceDBImpl(config: Config, userDao: UserDao) extends UserService {
         case e: Exception => Left(ErrorResponse(e.getMessage, 0))
       }
 
-//    encryptPassword(user)
-//      .zip(isUsernameUnique(user))
-//      .flatMap { encUserAndIsUnique: (User, Boolean) =>
-//
-//        val (pwdEncryptedUser, isUnameUnique) = encUserAndIsUnique
-//        if(isUnameUnique)
-//          userDao.insert(pwdEncryptedUser)
-//        else throw new IllegalArgumentException(s"Username ${pwdEncryptedUser.username} already exists.")
-//      }
-//      .map { created =>
-//        Right(created)
-//      }
-
-    //    encryptPassword(user)
-    //      .flatMap { pwdEncryptedUser =>
-    //        userDao.insert(pwdEncryptedUser)
-    //      }
-    //      .map { created =>
-    //        Right(created)
-    //      }
-
-    //    createdUser
-    //      .foreach { user =>
-    //        logger.info("[create] - User Created with ID {}.", user.id)
-    //      }
-    //
-    //    createdUser
-    //      .foreach { user =>
-    //        logger.info("[create] - Sending an email for successful reg to {}.", user.email)
-    //        //sendEmail
-    //      }
-
-    //    createdUser
-    //      .andThen {
-    //        case scala.util.Success(user) => logger.info("[create] - User Created with ID {}.", user.id)
-    //      }
-    //      .andThen {
-    //        case scala.util.Success(user) => logger.info("[create] - Sending an email for successful reg to {}.", user.email)
-    //        //sendEmail
-    //      }
-
-    //    createdUser
-    //      .map{user =>
-    //        Right(user)
-    //      }
   }
 
-  def encryptPassword(user: User): Future[User] =
+  private def encryptPassword(user: User): Future[User] =
     Util
       .encrypt(user.password)
       .map(encrypted => user.copy(password = encrypted))
 
-  def isUsernameUnique(user: User): Future[Boolean] =
+  private def isUsernameUnique(user: User): Future[Boolean] =
     userDao
       .byUsername(user.username)
       .map(_.isEmpty)
 
-  //  override def create(user: User): Future[ServiceResponse[User]] = {
-  //    logger.info("[create] - {}", user.id)
-  //
-  //    userDao
-  //      .insert(user)
-  //      .map(Right(_))
-  //      .recover {
-  //        case e: Exception =>
-  //          logger.info("[create] - exception occurred: {}", e.getMessage)
-  //          e.printStackTrace()
-  //          Left(ErrorResponse(e.getMessage, 0))
-  //      }
-  //  }
 
   override def byId(id: UUID): Future[ServiceResponse[User]] = {
     logger.info("[byId] - {}", id)
