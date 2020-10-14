@@ -1,0 +1,49 @@
+<configuration>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>warn</level>
+        </filter>
+        <encoder>
+            <pattern>%date{HH:mm:ss} %-5level [%X{akkaSource}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" target="System.out" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{HH:mm:ss} %-5level [%thread] [%X{akkaSource}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>${globomantics-contest.log-file:-globomantics-contest.log}</file>
+        <encoder>
+            <pattern>%date{HH:mm:ss} [%thread] %-5level [%X{akkaSource}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.globomantics" level="debug" additivity="false">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="com.globomantics" level="info" additivity="false">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="akka.actor.RepointableActorRef" level="debug" additivity="false">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="warn">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

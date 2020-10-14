@@ -1,12 +1,12 @@
 package com.globomantics
 
-
 import akka.actor
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorSystem, Behavior}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Route
+import com.globomantics.actors.ContestManager
 import com.globomantics.routes.ContestRoutes
-import com.globomantics.actors.{ContestActor, ContestManager}
 
 import scala.util.{Failure, Success}
 
@@ -19,16 +19,20 @@ object BackendService {
     Behaviors.setup { context =>
       val system = context.system
 
-      val port = 8080
-      val host = "localhost"
-
       implicit val classicActorSystem: actor.ActorSystem = system.classicSystem
       import system.executionContext
 
-      val contestManager = context.spawn(ContestManager(), "contest-manager")
-      val allRoutes = new ContestRoutes(contestManager)(system)
+      val contestManager: ActorRef[ContestManager.Command] =
+        context.spawn(ContestManager(), "contest-manager")
 
-      val futureBinding = Http().bindAndHandle(allRoutes.routes, host, port)
+      val contestRoutes: ContestRoutes = new ContestRoutes(contestManager)(system)
+
+      val allRoutes: Route = contestRoutes.routes
+
+      val port = 8081
+      val host = "localhost"
+
+      val futureBinding = Http().bindAndHandle(allRoutes, host, port)
       context.log.info("Starting Backend Service at http://{}:{}", host, port)
 
       futureBinding
@@ -48,7 +52,9 @@ object BackendService {
     * @param args => Arguments to application.
     */
   def main(args: Array[String]): Unit = {
+
     ActorSystem(BackendService(), "g-backend-service")
+
   }
 
 }
