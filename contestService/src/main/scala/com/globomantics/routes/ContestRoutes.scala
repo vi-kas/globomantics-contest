@@ -68,6 +68,11 @@ class ContestRoutes(contest: ActorRef[ContestManager.Command])(implicit val syst
                 contest ! ContestManager.StartContest(id)
 
                 complete(StatusCodes.Accepted, s"Request to start contest with Id: $id received.")
+              },
+              (get & path("stop")){
+                contest ! ContestManager.StopContest(id)
+
+                complete(StatusCodes.Accepted, s"Request to stop contest with Id: $id received.")
               }
             )
           }

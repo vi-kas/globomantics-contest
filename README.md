@@ -69,4 +69,5 @@ To Switch to newly created database:
 To create the table:
 ```sql
 CREATE TABLE public.users_t (id UUID, name VARCHAR ( 50 ), username VARCHAR ( 50 ) UNIQUE NOT NULL, password VARCHAR ( 50 ), email VARCHAR ( 255 ) UNIQUE NOT NULL);
+CREATE TABLE public.contests_t (id UUID, title VARCHAR ( 50 ), durationInMinutes DOUBLE PRECISION);
 ```

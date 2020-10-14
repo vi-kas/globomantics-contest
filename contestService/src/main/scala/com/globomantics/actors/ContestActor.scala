@@ -2,8 +2,8 @@ package com.globomantics.actors
 
 import java.util.UUID
 
+import akka.actor.typed._
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
 
 object ContestActor {
 
@@ -35,7 +35,11 @@ object ContestActor {
   case class ContestResponse(success: Boolean, status: ContestStatus) extends Response
 
   def apply(registrations: Set[UUID] = Set.empty, status: ContestStatus = NotStarted): Behavior[Command] =
-    Behaviors.receive { (ctx, message) =>
+    Behaviors.supervise(notStarted()).onFailure(SupervisorStrategy.restart)
+
+  private def notStarted(registrations: Set[UUID] = Set.empty,
+                         status: ContestStatus = NotStarted): Behavior[Command] =
+    Behaviors.receive[Command] { (ctx, message) =>
       message match {
 
         case Register(participantId, replyTo) =>
@@ -61,30 +65,35 @@ object ContestActor {
           Behaviors.same
       }
     }
+      .receiveSignal {
+        case (ctx, PreRestart) =>
+          ctx.log.info("Contest Actor Restarting")
+          Behaviors.same
+      }
 
   private def active(registrations: Set[UUID],
                      status: ContestStatus): Behavior[Command] =
     Behaviors
-      .receive { (ctx, msg) =>
-        msg match {
+      .receive[Command] { (ctx, msg) =>
+      msg match {
 
-          case Stop(_) =>
-            ctx.log.info("Stopping Contest.")
-            completed(registrations, Completed)
+        case Stop(replyTo) =>
+          ctx.log.info("Stopping Contest.")
+          replyTo ! ContestResponse(success = true, Completed)
+          Behaviors
+            .stopped(() =>
+              ctx.log.info(s"Contest Actor is being stopped." +
+                s"The PostStop signal will be passed to current behaviour." +
+                s"All other messages and signals will effectively be ignored."))
 
-          case other =>
-            ctx.log.info("Request received: {} | Contest is active, try sending a Stop command.", other)
-            Behaviors.same
-        }
-
+        case other =>
+          ctx.log.info("Request received: {} | Contest is active, try sending a Stop command.", other)
+          Behaviors.same
       }
-
-  private def completed(registrations: Set[UUID],
-                        status: ContestStatus): Behavior[Command] =
-    Behaviors
-      .receive { (ctx, _) =>
-        ctx.log.info("Contest is over, can't serve this request anymore.")
-        Behaviors.stopped
+    }
+      .receiveSignal {
+        case (ctx, PostStop) =>
+          ctx.log.info("Contest Actor stopped")
+          Behaviors.same
       }
-
 }

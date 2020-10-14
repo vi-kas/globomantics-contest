@@ -22,7 +22,9 @@ object BackendService {
       implicit val classicActorSystem: actor.ActorSystem = system.classicSystem
       import system.executionContext
 
-      val contestManager: ActorRef[ContestManager.Command] = context.spawn(ContestManager(), "contest-manager")
+      val contestManager: ActorRef[ContestManager.Command] =
+        context.spawn(ContestManager(), "contest-manager")
+
       val contestRoutes: ContestRoutes = new ContestRoutes(contestManager)(system)
 
       val allRoutes: Route = contestRoutes.routes

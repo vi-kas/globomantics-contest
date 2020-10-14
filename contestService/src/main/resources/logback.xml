@@ -11,14 +11,14 @@
 
     <appender name="STDOUT" target="System.out" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%date{HH:mm:ss} %-5level [%X{akkaSource}] - %msg%n</pattern>
+            <pattern>%date{HH:mm:ss} %-5level [%thread] [%X{akkaSource}] - %msg%n</pattern>
         </encoder>
     </appender>
 
     <appender name="file" class="ch.qos.logback.core.FileAppender">
         <file>${globomantics-contest.log-file:-globomantics-contest.log}</file>
         <encoder>
-            <pattern>%date{HH:mm:ss} %-5level [%X{akkaSource}] - %msg%n</pattern>
+            <pattern>%date{HH:mm:ss} [%thread] %-5level [%X{akkaSource}] - %msg%n</pattern>
         </encoder>
     </appender>
 
